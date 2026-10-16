@@ -347,6 +347,10 @@
     .hidden-object-heading, .third-story-panel { grid-column: 1 / -1; }
     .hidden-object-heading h2, .third-story-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
     .hidden-object-heading p, .third-story-note { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .anomaly-scene-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .anomaly-scene-option { min-height: 36px; padding: 0 12px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; font-size: 12px; }
+    .anomaly-scene-option[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: white; }
+    .anomaly-scene-option:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
     .hidden-object-image { position: relative; width: 100%; min-width: 0; aspect-ratio: 3 / 2; overflow: hidden; background: #17334a; }
     .hidden-object-image > img { position: absolute; inset: 0; display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; }
     .hidden-object-image-error { position: absolute; z-index: 2; inset: auto 8px 8px; margin: 0; padding: 8px; background: var(--white); color: #a33d30; font-size: 12px; text-align: center; }
@@ -931,9 +935,13 @@
       <section class="level-three-layout" id="level-three" aria-label="Третий уровень: найди несоответствия на картине" hidden>
         <div class="third-discovery" id="third-discovery">
           <header class="hidden-object-heading">
-            <span class="label">Третий уровень · Маленький принц</span>
+            <span class="label" id="third-scene-kicker">Третий уровень · Маленький принц</span>
             <h2>Найдите несоответствия и соберите рассказ</h2>
-            <p>Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — и получите слова для своего рассказа. Найдите все 10, выберите 10 слов из 30 и дополните ими свою историю до 33 слов.</p>
+            <p id="third-scene-description">Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — и получите слова для своего рассказа. Найдите все 10, выберите 10 слов из 30 и дополните ими свою историю до 33 слов.</p>
+            <div class="anomaly-scene-selector" id="anomaly-scene-selector" role="group" aria-label="Выберите иллюстрацию">
+              <button class="anomaly-scene-option" type="button" data-scene="little-prince" aria-pressed="true">Маленький принц</button>
+              <button class="anomaly-scene-option" type="button" data-scene="fairytale" aria-pressed="false">Сказочная иллюстрация</button>
+            </div>
           </header>
           <div class="hidden-object-panel">
             <p class="hidden-object-progress" id="anomaly-progress" aria-live="polite">Найдено 0 / 10 несоответствий</p>
@@ -1107,6 +1115,9 @@
         document.querySelector("#help-panel-two"),
         document.querySelector("#help-panel-three")
       ];
+      const anomalySceneSelector = document.querySelector("#anomaly-scene-selector");
+      const anomalySceneKicker = document.querySelector("#third-scene-kicker");
+      const anomalySceneDescription = document.querySelector("#third-scene-description");
       const anomalyImage = document.querySelector("#hidden-object-image");
       const anomalyPhoto = document.querySelector("#anomaly-photo");
       const anomalyImageError = document.querySelector("#anomaly-image-error");
@@ -1157,18 +1168,46 @@
         { id: "garnet-bracelet", title: "Гранатовый браслет", author: "А.И. Куприн", year: "1911", page: "Гранатовый браслет (Куприн)", text: `Я знаю, что я не могу быть с вами. Но я люблю вас. Я люблю вас так, как никто. Я не прошу ничего. Я просто хочу, чтобы вы знали. Я счастлив уже тем, что вы есть. Я пишу вам это письмо. Я не надеюсь на ответ. Я хочу, чтобы вы помнили обо мне. Я умру с мыслью о вас. Прощайте. Это было последнее письмо. Он умер. Она получила письмо. Она заплакала. Она поняла, что потеряла настоящую любовь. Она прочитала письмо ещё раз. Она посмотрела на браслет. Она вспомнила его лицо. Она поняла, что он был единственным, кто любил её по-настоящему. Она жалела, что не ответила ему. Но было поздно. Она осталась одна.` },
         { id: "dark-alleys", title: "Тёмные аллеи", author: "И.А. Бунин", year: "1943", page: "Тёмные аллеи (Бунин)", text: `Он вспомнил свою молодость. Он вспомнил Надежду. Он понял, что потерял счастье. Он думал о том, что могло быть. Он жалел о прошлом. Он ехал в тарантасе. Он смотрел на поля. Он думал о своей жизни. Он понял, что она прошла мимо. Он хотел вернуть время назад. Но было поздно. Он заплакал. Он понял, что Надежда была его единственной любовью. Он потерял её навсегда. Он приехал на станцию. Он увидел её. Она была всё той же. Он понял, что всё ещё любит её. Но она не подошла к нему. Она только посмотрела. И он понял, что между ними всё кончено. Он уехал. И больше никогда не вернулся.` }
       ];
-      const anomalies = [
-        { id: "dinosaur", label: "Тиранозавр среди птиц", words: ["Тиран", "голод", "гигант"], x: 0, y: 41, width: 15, height: 14 },
-        { id: "bast-shoes", label: "Лапти на ногах принца", words: ["простота", "лапоть", "бедность"], x: 37, y: 46, width: 8, height: 8 },
-        { id: "ring", label: "Кольцо на груди принца", words: ["власть", "миссия", "предназначение"], x: 41, y: 25, width: 5, height: 7 },
-        { id: "apple", label: "Красное яблоко на небе", words: ["раздор", "красота", "сок"], x: 59, y: 10, width: 5, height: 7 },
-        { id: "death-star", label: "Звезда смерти на небе", words: ["смерть", "разрушение", "страх"], x: 83, y: 4, width: 10, height: 14 },
-        { id: "birch", label: "Берёза", words: ["Род", "праздник", "чистота"], x: 56, y: 27, width: 8, height: 24 },
-        { id: "cat", label: "Кот", words: ["опыт", "умиление", "попрошайка"], x: 66, y: 25, width: 13, height: 20 },
-        { id: "lake", label: "Озеро с камышами", words: ["поверхность", "круг", "шелест"], x: 60, y: 63, width: 15, height: 14 },
-        { id: "carving", label: "Лик, вырезанный на баобабе у озера", words: ["лик", "предки", "божество"], x: 76, y: 55, width: 8, height: 15 },
-        { id: "rose", label: "Красная ромашка вместо розы", words: ["гадание", "любовь", "предательство"], x: 45, y: 37, width: 9, height: 13 }
+      const anomalyScenes = [
+        {
+          id: "little-prince",
+          title: "Маленький принц",
+          description: "Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — и получите слова для своего рассказа. Найдите все 10, выберите 10 слов из 30 и дополните ими свою историю до 33 слов.",
+          image: anomalyPhoto.src,
+          anomalies: [
+            { id: "dinosaur", label: "Тиранозавр среди птиц", words: ["Тиран", "голод", "гигант"], x: 0, y: 41, width: 15, height: 14 },
+            { id: "bast-shoes", label: "Лапти на ногах принца", words: ["простота", "лапоть", "бедность"], x: 37, y: 46, width: 8, height: 8 },
+            { id: "ring", label: "Кольцо на груди принца", words: ["власть", "миссия", "предназначение"], x: 41, y: 25, width: 5, height: 7 },
+            { id: "apple", label: "Красное яблоко на небе", words: ["раздор", "красота", "сок"], x: 59, y: 10, width: 5, height: 7 },
+            { id: "death-star", label: "Звезда смерти на небе", words: ["смерть", "разрушение", "страх"], x: 83, y: 4, width: 10, height: 14 },
+            { id: "birch", label: "Берёза", words: ["Род", "праздник", "чистота"], x: 56, y: 27, width: 8, height: 24 },
+            { id: "cat", label: "Кот", words: ["опыт", "умиление", "попрошайка"], x: 66, y: 25, width: 13, height: 20 },
+            { id: "lake", label: "Озеро с камышами", words: ["поверхность", "круг", "шелест"], x: 60, y: 63, width: 15, height: 14 },
+            { id: "carving", label: "Лик, вырезанный на баобабе у озера", words: ["лик", "предки", "божество"], x: 76, y: 55, width: 8, height: 15 },
+            { id: "rose", label: "Красная ромашка вместо розы", words: ["гадание", "любовь", "предательство"], x: 45, y: 37, width: 9, height: 13 }
+          ]
+        },
+        {
+          id: "fairytale",
+          title: "Сказочная иллюстрация",
+          description: "На этой иллюстрации сказочного мира спрятано 10 несоответствий. Найдите их, выберите открывшиеся слова и соберите из них рассказ.",
+          image: "fairytale_mismatch_final_v7.png",
+          anomalies: [
+            { id: "cannabis-leaves", label: "Листья конопли", words: ["Дух", "экзотика", "дурман"], x: 31, y: 14, width: 10, height: 11 },
+            { id: "flashlight", label: "Фонарик", words: ["свет", "луч", "прозрение"], x: 7, y: 37, width: 9, height: 11 },
+            { id: "monkey", label: "Обезьяна", words: ["ловкость", "обман", "вор"], x: 49, y: 44, width: 10, height: 12 },
+            { id: "baba-yaga-beard", label: "Борода Бабы-яги", words: ["бритва", "волосы", "знахарь"], x: 75, y: 35, width: 12, height: 14 },
+            { id: "laptop", label: "Ноутбук", words: ["буквы", "плата", "документ"], x: 8, y: 25, width: 11, height: 12 },
+            { id: "flippers", label: "Ласты", words: ["нырок", "глубина", "пучина"], x: 56, y: 81, width: 12, height: 10 },
+            { id: "budenovka", label: "Будёновка", words: ["звезда", "служба", "долг"], x: 79, y: 57, width: 10, height: 12 },
+            { id: "sneakers", label: "Кеды", words: ["скорость", "комфорт", "ноги"], x: 38, y: 67, width: 11, height: 9 },
+            { id: "olympic-rings", label: "Олимпийские кольца", words: ["соперничество", "вершина", "достижение"], x: 89, y: 5, width: 9, height: 11 },
+            { id: "aliens", label: "Инопланетяне", words: ["контакт", "иные", "слежка"], x: 3, y: 4, width: 14, height: 13 }
+          ]
+        }
       ];
+      let activeAnomalyScene = anomalyScenes[0];
+      let anomalies = activeAnomalyScene.anomalies;
       const passageSelect = document.querySelector("#passage-select");
       const passageTitle = document.querySelector("#passage-title");
       const passageSource = document.querySelector("#passage-source");
@@ -1408,6 +1447,31 @@
           prehistoryInput.value = enteredWords.join(" ");
         }
         prehistoryCount.textContent = `${enteredWords.length} / 33 слов`;
+      }
+
+      function selectAnomalyScene(sceneId) {
+        const scene = anomalyScenes.find((item) => item.id === sceneId);
+        if (!scene) throw new Error(`Unknown anomaly scene: ${sceneId}`);
+        activeAnomalyScene = scene;
+        anomalies = scene.anomalies;
+        foundAnomalies.clear();
+        chosenAnomalyWords.clear();
+        thirdStoryEntries = [];
+        thirdStoryStarted = false;
+        thirdDiscovery.hidden = false;
+        thirdStartPanel.hidden = true;
+        thirdStoryPanel.hidden = true;
+        thirdFinishModal.hidden = true;
+        anomalySceneKicker.textContent = `Третий уровень · ${scene.title}`;
+        anomalySceneDescription.textContent = scene.description;
+        anomalyPhoto.alt = `Иллюстрация «${scene.title}»`;
+        anomalyPhoto.src = scene.image;
+        anomalyProgress.textContent = "Найдено 0 / 10 несоответствий";
+        anomalySceneSelector.querySelectorAll("[data-scene]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.scene === scene.id));
+        });
+        renderAnomalyBoard();
+        renderAnomalyWords();
       }
 
       function renderAnomalyBoard(focusAnomalyId = null) {
@@ -2099,10 +2163,17 @@
         renderAnomalyWords();
       });
 
+      anomalySceneSelector.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-scene]");
+        if (!button) return;
+        selectAnomalyScene(button.dataset.scene);
+      });
+
       anomalyPhoto.addEventListener("error", () => {
         anomalyImageError.hidden = false;
       });
       anomalyPhoto.addEventListener("load", () => {
+        anomalyImage.style.aspectRatio = `${anomalyPhoto.naturalWidth} / ${anomalyPhoto.naturalHeight}`;
         anomalyImageError.hidden = true;
       });
       if (anomalyPhoto.complete && anomalyPhoto.naturalWidth === 0) {
