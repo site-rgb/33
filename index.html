@@ -937,7 +937,7 @@
           <header class="hidden-object-heading">
             <span class="label" id="third-scene-kicker">Третий уровень · Маленький принц</span>
             <h2>Найдите несоответствия и соберите рассказ</h2>
-            <p id="third-scene-description">Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — и получите слова для своего рассказа. Найдите все 10, выберите 10 слов из 30 и дополните ими свою историю до 33 слов.</p>
+            <p id="third-scene-description">Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — за каждое открываются три слова. Выбирайте слова по мере открытия и в любой момент добавляйте их в свободный редактор.</p>
             <div class="anomaly-scene-selector" id="anomaly-scene-selector" role="group" aria-label="Выберите иллюстрацию">
               <button class="anomaly-scene-option" type="button" data-scene="little-prince" aria-pressed="true">Маленький принц</button>
               <button class="anomaly-scene-option" type="button" data-scene="fairytale" aria-pressed="false">Сказки Пушкина</button>
@@ -954,7 +954,7 @@
           <aside class="hidden-object-panel">
             <p class="hidden-object-progress" id="anomaly-word-progress" aria-live="polite">Открыто 0 / 30 слов · выбрано 0 / 10</p>
             <div id="anomaly-word-groups">
-              <p class="third-story-note">Нажимай на картину, чтобы находить несоответствия. Когда найдёшь все десять, выбери любые десять слов.</p>
+              <p class="third-story-note">Нажимай на картину, чтобы находить несоответствия и открывать слова. Выбранные слова можно в любой момент добавить в свободный редактор.</p>
             </div>
           </aside>
         </div>
@@ -1039,7 +1039,7 @@
       </div>
       <div class="help-panel" id="help-panel-three" hidden>
         <h3>Несоответствия</h3>
-        <p>В игре «Несоответствия» вы выбираете иллюстрацию и ищите в ней несоответствия. Кликаете на него, когда нашли, и сбоку появляются слова, ставшие доступными для выбора. Несоответствий — 10. За каждое найденное несоответствие вы получаете возможность выбрать одно из трёх открывшихся слов. Когда вы выберете все 10 слов, они перенесутся в форму для составления рассказа. Там нужно будет дописать слова, которых не хватает до 33, и расставить их (перетаскиванием) в нужном порядке.</p>
+        <p>В игре «Несоответствия» вы выбираете иллюстрацию и ищите в ней несоответствия. За каждое найденное несоответствие открываются три слова, из которых можно выбирать сразу. Выбранные слова в любой момент можно добавить в свободный редактор. Чтобы начать рассказ во встроенной форме, выберите 10 слов; затем дополните рассказ до 33 слов и расставьте их в нужном порядке.</p>
         <p>Как и во всех других играх, если хотите, в любой момент можете перенести ваши слова в свободный редактор и писать по своим правилам. Он всегда расположен внизу страницы во всех играх.</p>
       </div>
       <button class="finish-button" id="help-close" type="button">Понятно</button>
@@ -1515,7 +1515,6 @@
 
       function renderAnomalyWords(focusWordKey = null) {
         anomalyWordGroups.replaceChildren();
-        const canChoose = foundAnomalies.size === anomalies.length;
         anomalies.filter((anomaly) => foundAnomalies.has(anomaly.id)).forEach((anomaly) => {
           const group = document.createElement("section");
           group.className = "anomaly-word-group";
@@ -1530,8 +1529,7 @@
             button.className = "anomaly-word-option";
             button.dataset.wordKey = key;
             button.textContent = word;
-            button.disabled = !canChoose
-              || thirdStoryStarted
+            button.disabled = thirdStoryStarted
               || (!chosenAnomalyWords.has(key) && chosenAnomalyWords.size >= 10);
             button.setAttribute("aria-pressed", String(chosenAnomalyWords.has(key)));
             options.append(button);
@@ -1539,15 +1537,15 @@
           group.append(heading, options);
           anomalyWordGroups.append(group);
         });
-        if (!canChoose) {
+        if (foundAnomalies.size === 0) {
           const note = document.createElement("p");
           note.className = "third-story-note";
-          note.textContent = "Найди все 10 несоответствий — тогда откроются все 30 слов.";
+          note.textContent = "Найди несоответствие, чтобы открыть три слова. Выбранные слова можно в любой момент добавить в свободный редактор.";
           anomalyWordGroups.append(note);
         } else if (chosenAnomalyWords.size < 10) {
           const note = document.createElement("p");
           note.className = "third-story-note";
-          note.textContent = "Выбери любые 10 слов из 30.";
+          note.textContent = "Выбирай слова из открытых вариантов. Для встроенного рассказа нужно выбрать 10 слов; в свободный редактор их можно добавить в любой момент.";
           anomalyWordGroups.append(note);
         }
         anomalyWordProgress.textContent = `Открыто ${foundAnomalies.size * 3} / 30 слов · выбрано ${chosenAnomalyWords.size} / 10`;
